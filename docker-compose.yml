@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # 天气 Agent
+  weather_server:
+    build: SmartVoyage-main
+    command: python mcp_server/weather_server.py  # 请替换为你实际的启动文件路径
+    ports:
+      - "5005:5005"
+    env_file:
+      - .env  # 读取你的 API Key
+
+  # 票务查询 Agent
+  ticket_server:
+    build: SmartVoyage-main
+    command: python mcp_server/ticket_server.py   # 请替换为你实际的启动文件路径
+    ports:
+      - "5006:5006"
+    env_file:
+      - .env
+
+  # 票务预定 Agent
+  order_server:
+    build: SmartVoyage-main
+    command: python mcp_server/order_server.py    # 请替换为你实际的启动文件路径
+    ports:
+      - "5007:5007"
+    env_file:
+      - .env
+
+  # 主控 Router (FastAPI 服务)
+  main_router:
+    build: SmartVoyage-main
+    command: python api_server.py
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - weather_server
+      - ticket_server
+      - order_server
